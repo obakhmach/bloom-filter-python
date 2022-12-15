@@ -4,8 +4,8 @@ from functools import cached_property
 from typing import Optional, cast
 
 from bitarray import bitarray
-from mmh3 import hash as mhash
 from cityhash import CityHash64 as chash
+from mmh3 import hash as mhash
 
 
 class BloomFilter:
@@ -86,3 +86,29 @@ class BloomFilter:
         aka_random_hash: int = murmur_hash + seed * city_hash
 
         return aka_random_hash % self._number_of_bits
+
+    def insert(self, item: str) -> bool:
+        """Saves a given item to the bloom filter.
+        Returns false if the bloom filter is full.
+        Returns true if the insertion was successful.
+
+        Args:
+            item: The item to insert.
+
+        Returns:
+            Boolean value indicating the success of the inserting operation.
+        """
+        if could_be_inserted := self._items_added < self._items_count:
+            seed: int
+
+            for seed in range(self._number_of_hashes):
+                item_hash_index: int = self._calc_random_bit_array_index(item, seed)
+
+                self._buffer[item_hash_index] = True
+
+            self._items_added += 1
+
+            return could_be_inserted
+
+        else:
+            return could_be_inserted

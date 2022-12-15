@@ -1,5 +1,6 @@
-from bfilter.bloom import BloomFilter
 from pytest import raises
+
+from bfilter.bloom import BloomFilter
 
 
 def test_init_valid():
@@ -52,3 +53,30 @@ def test_invalid_bloom_filter_false_positive_probability_configuration():
         bloom_filter: BloomFilter = BloomFilter(
             invalid_items_count, expected_false_positive_probability
         )
+
+
+def test_bloom_filter_insert():
+    expected_false_positive_probability: float = 0.04  # Expecting 4%
+    items_count: int = 100000000
+    test_item: str = "Coke"
+
+    bloom_filter: BloomFilter = BloomFilter(
+        items_count, expected_false_positive_probability
+    )
+
+    assert bloom_filter.insert(test_item)
+
+
+def test_bloom_filter_could_not_insert():
+    expected_false_positive_probability: float = 0.04  # Expecting 4%
+    items_count: int = 30
+    test_item: str = "Coke"
+
+    bloom_filter: BloomFilter = BloomFilter(
+        items_count, expected_false_positive_probability
+    )
+
+    for _ in range(items_count):
+        assert bloom_filter.insert(test_item)
+
+    assert not bloom_filter.insert(test_item)
