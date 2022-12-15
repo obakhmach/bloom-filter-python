@@ -5,13 +5,15 @@ from typing import Optional, cast
 
 from bitarray import bitarray
 from mmh3 import hash as mhash
-from mmh3 import city_hash as chash
+from cityhash import CityHash64 as chash
 
 
 class BloomFilter:
     DEFAULT_FALSE_POSITIVE_PROBABILITY: float = 0.3
 
-    def __init__(self, items_count: int, false_positive_probability: Optional[float] = None) -> None:
+    def __init__(
+        self, items_count: int, false_positive_probability: Optional[float] = None
+    ) -> None:
         """Constructor to init the bloom filter in most simplest form.
 
         Args:
@@ -19,6 +21,9 @@ class BloomFilter:
             false_positive_probability: The probability of false positive responses from the
                                         bloom filter.
         """
+        if items_count <= 0:
+            raise ValueError("Items count should be bigger then 0.")
+
         self._items_added: int = 0
         self._items_count: int = items_count
         self._false_positive_probability: float
@@ -26,6 +31,11 @@ class BloomFilter:
 
         if false_positive_probability is None:
             self._false_positive_probability = self.DEFAULT_FALSE_POSITIVE_PROBABILITY
+
+        elif false_positive_probability >= 1 or false_positive_probability <= 0:
+            raise ValueError(
+                "False positive probability should be higher than 0 and less than 1."
+            )
 
         else:
             self._false_positive_probability = false_positive_probability
@@ -43,7 +53,10 @@ class BloomFilter:
         Returns:
             The number of bits for bloom filter bit array.
         """
-        return - (self._items_count * math.log(self._false_positive_probability, math.e)) / math.log(2, math.e) ** 2
+        return int(
+            -(self._items_count * math.log(self._false_positive_probability, math.e))
+            / math.log(2, math.e) ** 2
+        )
 
     @cached_property
     def _number_of_hashes(self) -> int:
@@ -53,13 +66,13 @@ class BloomFilter:
         Returns:
             The best number of hash
         """
-        return -math.log2(self._false_positive_probability)
+        return int(-math.log2(self._false_positive_probability))
 
     def _calc_random_bit_array_index(self, item: str, seed: int) -> int:
-        """Calculates the bit to set in a bit array for a given item. 
-        This calculation per seed simulates the behavior 
+        """Calculates the bit to set in a bit array for a given item.
+        This calculation per seed simulates the behavior
         of using unique hash function per a unique seed.
-        
+
         Args:
             item: An item we want to remember in the bloom filter.
             seed: Any integer number.
