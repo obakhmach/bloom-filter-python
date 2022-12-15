@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 setup(
     name="bfilter",
     packages=find_packages(include=["bfilter"]),
-    version="0.1.0",
+    version="0.1.1",
     description="Python simple implementation for the bloom filter.",
     author="alexandrbakhmachr@gmail.com",
     license="MIT",
