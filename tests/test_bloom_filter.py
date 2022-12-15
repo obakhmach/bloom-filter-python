@@ -80,3 +80,18 @@ def test_bloom_filter_could_not_insert():
         assert bloom_filter.insert(test_item)
 
     assert not bloom_filter.insert(test_item)
+
+
+def test_bloom_filter():
+    expected_false_positive_probability: float = 0.04  # Expecting 4%
+    items_count: int = 30
+    test_item: str = "Coke"
+    test_absent_item: str = "Water"
+
+    bloom_filter: BloomFilter = BloomFilter(
+        items_count, expected_false_positive_probability
+    )
+
+    assert bloom_filter.insert(test_item)
+    assert bloom_filter.is_probably_present(test_item)
+    assert not bloom_filter(test_absent_item)

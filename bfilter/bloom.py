@@ -112,3 +112,37 @@ class BloomFilter:
 
         else:
             return could_be_inserted
+
+    def is_probably_present(self, item: str) -> bool:
+        """Given the negative or false positive answer about the item presence in the bloom filter.
+
+        Args:
+            item: The item to check it's presence.
+
+        Returns:
+            The boolean value indicating the presence of item in bloom filter.
+            The true means that item is probably presence with _false_positive_probability probability
+            responding wrong and false if item is not present.
+        """
+        seed: int
+
+        for seed in range(self._number_of_hashes):
+            item_hash_index: int = self._calc_random_bit_array_index(item, seed)
+
+            if not self._buffer[item_hash_index]:
+                return False
+
+        return True
+
+    def __call__(self, item: str) -> bool:
+        """Given the negative or false positive answer about the item presence in the bloom filter.
+
+        Args:
+            item: The item to check it's presence.
+
+        Returns:
+            The boolean value indicating the presence of item in bloom filter.
+            The true means that item is probably presence with _false_positive_probability probability
+            responding wrong and false if item is not present.
+        """
+        return self.is_probably_present(item)
