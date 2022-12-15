@@ -1,7 +1,6 @@
 # Bloom Filter
 Simple bloom filter implementation in Python.
 
-To use this crate in any Rust project just one of the following dependencies.
 
 ## Install
 To install a python library just execute one of the following command.
